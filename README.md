@@ -4,16 +4,6 @@ Unity NPM version of Game Lift Managed Server C# SDK! This repository applies th
 
 Original Source Location: [https://aws.amazon.com/pt/gamelift/getting-started/](https://aws.amazon.com/pt/gamelift/getting-started/).
 
-# How to install
-
-At package.json, add these line of code:
-> "com.gameworkstore.gameliftsdk": "git://github.com/GameWorkstore/gamelift-server-sdk"
-
-And wait for unity to download and compile the package.
-
-for update package for a newer version, install UpmGitExtension and update on [ Window > Package Manager ]!
-> https://github.com/mob-sakai/UpmGitExtension
-
 ## Documention
 You can find the official GameLift documentation [here](https://aws.amazon.com/documentation/gamelift/).
 
