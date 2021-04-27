@@ -1,6 +1,6 @@
 {
   "name": "com.gameworkstore.gameliftsdk",
-  "version": "1.0.0",
+  "version": "4.0.2000",
   "displayName": "GameWorkstore GameLift SDK",
   "description": "Game Lift Managed Server C# SDK for Unity. It supports only Linux64.",
   "unity": "2020.1",
