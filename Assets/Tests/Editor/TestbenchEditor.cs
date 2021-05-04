@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using Aws.GameLift.Server;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 public class TestbenchEditor
 {
@@ -18,12 +16,19 @@ public class TestbenchEditor
 
         var location = Path.Combine(dir, "Build/Server/LinuxServer");
 
-        var options = new BuildPlayerOptions {
+        var options = new BuildPlayerOptions
+        {
             target = BuildTarget.StandaloneLinux64,
             locationPathName = location,
             options = BuildOptions.EnableHeadlessMode
         };
         BuildPipeline.BuildPlayer(options);
         Assert.AreEqual(true, File.Exists(location));
+    }
+
+    [Test]
+    public void GameLiftIsIncluded()
+    {
+        Assert.AreEqual("4.0.2",GameLiftServerAPI.GetSdkVersion().Result);
     }
 }
