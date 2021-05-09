@@ -28,7 +28,7 @@ namespace Aws.GameLift.Server
         ProcessParameters processParameters;
         volatile bool processReady = false;
         string gameSessionId;
-        DateTime terminationTime = DateTime.MinValue; //init to 1/1/0001 12:00:00 AM
+        long terminationTime = -1;
 
         public static ServerState Instance { get; } = new ServerState();
 
@@ -79,13 +79,13 @@ namespace Aws.GameLift.Server
             return new AwsStringOutcome(gameSessionId);
         }
 
-        public AwsDateTimeOutcome GetTerminationTime()
+        public AwsLongOutcome GetTerminationTime()
         {
-            if (DateTime.MinValue == terminationTime)
+            if (terminationTime == -1)
             {
-                return new AwsDateTimeOutcome(new GameLiftError(GameLiftErrorType.TERMINATION_TIME_NOT_SET));
+                return new AwsLongOutcome(new GameLiftError(GameLiftErrorType.TERMINATION_TIME_NOT_SET));
             }
-            return new  AwsDateTimeOutcome(terminationTime);
+            return new AwsLongOutcome(terminationTime);
         }
 
         public GenericOutcome UpdatePlayerSessionCreationPolicy(PlayerSessionCreationPolicy playerSessionPolicy)
@@ -175,14 +175,14 @@ namespace Aws.GameLift.Server
         public GenericOutcome InitializeNetworking()
         {
             webSocketListener = new WebSocketListener(this);
-            return webSocketListener.Connect().Success ? 
+            return webSocketListener.Connect().Success ?
                 new GenericOutcome() : new GenericOutcome(new GameLiftError(GameLiftErrorType.LOCAL_CONNECTION_FAILED));
         }
 
         public GetInstanceCertificateOutcome GetInstanceCertificate()
         {
             Log.DebugFormat("Calling GetInstanceCertificate");
-            return httpClientInvoker.GetInstanceCertificate().Result;
+            return new GetInstanceCertificateOutcome(new GameLiftError(GameLiftErrorType.NETWORK_NOT_INITIALIZED));
         }
 
         public void OnStartGameSession(GameSession gameSession)
@@ -220,13 +220,17 @@ namespace Aws.GameLift.Server
 
         public void OnTerminateProcess(long terminationTime)
         {
-            // TerminationTime coming from AuxProxy is milliseconds that have elapsed since Unix epoch time begins (00:00:00 UTC Jan 1 1970).
-            this.terminationTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(terminationTime);
-
-            Log.DebugFormat("ServerState got the terminateProcess signal. termination time : {0}", this.terminationTime);
+            Log.DebugFormat("ServerState got the terminateProcess signal. termintation time : {0}", terminationTime);
 
             Task.Run(() =>
             {
+                /* TerminationTime coming from AuxProxy is seconds that have elapsed since Unix epoch time begins (00:00:00 UTC Jan 1 1970).
+                * Since epoch time for dotNet starts at 0001-01-01T00:00:00 we need to create a DateTime at the beginning of Unix epoch time
+                * and add the TerminationTime to that date.
+                */
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                terminationTime = epoch.AddSeconds(terminationTime).Ticks;
+
                 processParameters.OnProcessTerminate();
             });
         }

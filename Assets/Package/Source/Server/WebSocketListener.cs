@@ -103,7 +103,7 @@ namespace Aws.GameLift.Server
                         log.ErrorFormat("Unknown message type received. Data is \n{0}", e.Data);
                     } catch (Exception ex)
                     {
-                        log.Error($"could not parse message. Data is \n{e.Data}", ex);
+                        log.ErrorFormat("could not parse message. Data is \n{0}", e.Data, ex);
                     }
                 } 
                 else

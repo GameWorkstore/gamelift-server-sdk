@@ -160,7 +160,7 @@ namespace Aws.GameLift.Server
             {
                 var deserialized = BackfillMatchmakingResponse.Parser.ParseJson(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                 var translation = BackfillDataMapper.ParseFromBufferedBackfillMatchmakingResponse(deserialized);
-                return new StartMatchBackfillOutcome(translation);
+                new StartMatchBackfillOutcome(translation);
             }
 
             return new StartMatchBackfillOutcome(new GameLiftError(GameLiftErrorType.SERVICE_CALL_FAILED));

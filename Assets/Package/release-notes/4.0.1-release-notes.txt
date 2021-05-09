@@ -1,3 +1,0 @@
-- Fixed bug with GetInstanceCertificate
-- Modified GetTerminationTime to return AwsDateTimeOutcome
-- Deprecated TerminateGameSession in favor of ProcessEnding
