@@ -104,3 +104,18 @@ public class GameLiftServerExampleBehavior : MonoBehaviour
     }
 }
 ```
+## FAQ
+### When i call InitSDK, missing classes causes the server to not begin initialized, what is causing these errors?
+
+Check if your project settings has stripping level different than disabled. If yes, make sure you add a link.xml inside your project folder with
+the below contents:
+```
+<linker>
+    <assembly fullname="log4net" preserve="all"/>
+    <assembly fullname="Newtonsoft.Json" preserve="all"/>
+    <assembly fullname="websocket-sharp" preserve="all"/>
+</linker>
+```
+
+Link.xml inside packages folder aren't recognized by Unity, and this is the only way to prevent
+template and reflection classes/methods from begin stripped from the build.

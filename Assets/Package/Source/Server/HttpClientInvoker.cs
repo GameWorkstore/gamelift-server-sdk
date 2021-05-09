@@ -9,6 +9,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 *
 */
+
 using Aws.GameLift.Server.Model;
 using Com.Amazon.Whitewater.Auxproxy.Pbuffer;
 using Google.Protobuf;
@@ -21,10 +22,8 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
-namespace Aws.GameLift.Server
-{
-    public class HttpClientInvoker
-    {
+namespace Aws.GameLift.Server {
+    public class HttpClientInvoker {
         static readonly string GAMELIFT_API_HEADER = "gamelift-target";
         static readonly string GAMELIFT_PID_HEADER = "gamelift-server-pid";
 
@@ -33,18 +32,15 @@ namespace Aws.GameLift.Server
         HttpClient httpClient = new HttpClient();
         readonly string pid = Process.GetCurrentProcess().Id.ToString();
 
-        public HttpClientInvoker()
-        {
+        public HttpClientInvoker() {
             httpClient.BaseAddress = new Uri("http://localhost:5758/");
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Add(GAMELIFT_PID_HEADER, pid);
         }
 
-        public async Task<GenericOutcome> ProcessReady(int port, List<string> logPathsToUpload)
-        {
-            var pReady = new ProcessReady
-            {
+        public async Task<GenericOutcome> ProcessReady(int port, List<string> logPathsToUpload) {
+            var pReady = new ProcessReady {
                 Port = port,
                 LogPathsToUpload = { logPathsToUpload }
             };
@@ -54,18 +50,14 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GenericOutcome> ProcessEnding()
-        {
+        public async Task<GenericOutcome> ProcessEnding() {
             var response = await SendAsync(new ProcessEnding()).ConfigureAwait(false);
 
             return ParseHttpResponse(response);
-
         }
 
-        public async Task<GenericOutcome> ReportHealth(bool isHealthy)
-        {
-            var rHealth = new ReportHealth
-            {
+        public async Task<GenericOutcome> ReportHealth(bool isHealthy) {
+            var rHealth = new ReportHealth {
                 HealthStatus = isHealthy
             };
 
@@ -74,10 +66,8 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GenericOutcome> ActivateGameSession(string gameSessionId)
-        {
-            var gameSessionActivate = new GameSessionActivate
-            {
+        public async Task<GenericOutcome> ActivateGameSession(string gameSessionId) {
+            var gameSessionActivate = new GameSessionActivate {
                 GameSessionId = gameSessionId
             };
 
@@ -86,10 +76,8 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GenericOutcome> TerminateGameSession(string gameSessionId)
-        {
-            var gameSessionTerminate = new GameSessionTerminate
-            {
+        public async Task<GenericOutcome> TerminateGameSession(string gameSessionId) {
+            var gameSessionTerminate = new GameSessionTerminate {
                 GameSessionId = gameSessionId
             };
 
@@ -98,10 +86,8 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GenericOutcome> UpdatePlayerSessionCreationPolicy(string gameSessionId, PlayerSessionCreationPolicy playerSessionPolicy)
-        {
-            var updatePlayerSessionCreationPolicy = new UpdatePlayerSessionCreationPolicy
-            {
+        public async Task<GenericOutcome> UpdatePlayerSessionCreationPolicy(string gameSessionId, PlayerSessionCreationPolicy playerSessionPolicy) {
+            var updatePlayerSessionCreationPolicy = new UpdatePlayerSessionCreationPolicy {
                 GameSessionId = gameSessionId,
                 NewPlayerSessionCreationPolicy = PlayerSessionCreationPolicyMapper.GetNameForPlayerSessionCreationPolicy(playerSessionPolicy)
             };
@@ -111,10 +97,8 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GenericOutcome> AcceptPlayerSession(string playerSessionId, string gameSessionId)
-        {
-            var acceptPlayerSession = new AcceptPlayerSession
-            {
+        public async Task<GenericOutcome> AcceptPlayerSession(string playerSessionId, string gameSessionId) {
+            var acceptPlayerSession = new AcceptPlayerSession {
                 PlayerSessionId = playerSessionId,
                 GameSessionId = gameSessionId
             };
@@ -124,10 +108,8 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GenericOutcome> RemovePlayerSession(string playerSessionId, string gameSessionId)
-        {
-            var removePlayerSession = new RemovePlayerSession
-            {
+        public async Task<GenericOutcome> RemovePlayerSession(string playerSessionId, string gameSessionId) {
+            var removePlayerSession = new RemovePlayerSession {
                 PlayerSessionId = playerSessionId,
                 GameSessionId = gameSessionId
             };
@@ -137,12 +119,10 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<DescribePlayerSessionsOutcome> DescribePlayerSessions(Model.DescribePlayerSessionsRequest request)
-        {
+        public async Task<DescribePlayerSessionsOutcome> DescribePlayerSessions(Model.DescribePlayerSessionsRequest request) {
             var body = DescribePlayerSessionsRequestMapper.ParseFromDescribePlayerSessionsRequest(request);
             var response = await SendAsync(body).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
-            {
+            if (response.IsSuccessStatusCode) {
                 var deserialized = DescribePlayerSessionsResponse.Parser.ParseJson(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                 var translation = DescribePlayerSessionsResult.ParseFromBufferedDescribePlayerSessionsResponse(deserialized);
                 return new DescribePlayerSessionsOutcome(translation);
@@ -151,23 +131,20 @@ namespace Aws.GameLift.Server
             return new DescribePlayerSessionsOutcome(new GameLiftError(GameLiftErrorType.BAD_REQUEST_EXCEPTION));
         }
 
-        public async Task<StartMatchBackfillOutcome> BackfillMatchmaking(StartMatchBackfillRequest request)
-        {
+        public async Task<StartMatchBackfillOutcome> BackfillMatchmaking(StartMatchBackfillRequest request) {
             var body = BackfillDataMapper.CreateBufferedBackfillMatchmakingRequest(request);
 
             var response = await SendAsync(body).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
-            {
+            if (response.IsSuccessStatusCode) {
                 var deserialized = BackfillMatchmakingResponse.Parser.ParseJson(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                 var translation = BackfillDataMapper.ParseFromBufferedBackfillMatchmakingResponse(deserialized);
-                new StartMatchBackfillOutcome(translation);
+                return new StartMatchBackfillOutcome(translation);
             }
 
             return new StartMatchBackfillOutcome(new GameLiftError(GameLiftErrorType.SERVICE_CALL_FAILED));
         }
 
-        public async Task<GenericOutcome> StopMatchmaking(StopMatchBackfillRequest request)
-        {
+        public async Task<GenericOutcome> StopMatchmaking(StopMatchBackfillRequest request) {
             var stopMatchmakingRequest = BackfillDataMapper.CreateBufferedStopMatchmakingRequest(request);
 
             var response = await SendAsync(stopMatchmakingRequest).ConfigureAwait(false);
@@ -175,12 +152,10 @@ namespace Aws.GameLift.Server
             return ParseHttpResponse(response);
         }
 
-        public async Task<GetInstanceCertificateOutcome> GetInstanceCertificate()
-        {
+        public async Task<GetInstanceCertificateOutcome> GetInstanceCertificate() {
             var response = await SendAsync(new GetInstanceCertificate()).ConfigureAwait(false);
 
-            if (response.IsSuccessStatusCode)
-            {
+            if (response.IsSuccessStatusCode) {
                 var deserialized = GetInstanceCertificateResponse.Parser.ParseJson(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
                 var translation = GetInstanceCertificateResult.ParseFromBufferedGetInstanceCertificateResponse(deserialized);
                 return new GetInstanceCertificateOutcome(translation);
@@ -188,10 +163,8 @@ namespace Aws.GameLift.Server
             return new GetInstanceCertificateOutcome(new GameLiftError(GameLiftErrorType.SERVICE_CALL_FAILED));
         }
 
-        private async Task<HttpResponseMessage> SendAsync(IMessage body)
-        {
-            var httpRequest = new HttpRequestMessage
-            {
+        private async Task<HttpResponseMessage> SendAsync(IMessage body) {
+            var httpRequest = new HttpRequestMessage {
                 Method = HttpMethod.Post
             };
             httpRequest.Headers.Add(GAMELIFT_API_HEADER, body.Descriptor.Name);
@@ -200,16 +173,14 @@ namespace Aws.GameLift.Server
             return await httpClient.SendAsync(httpRequest).ConfigureAwait(false);
         }
 
-        private GenericOutcome ParseHttpResponse(HttpResponseMessage response)
-        {
-            if (response.IsSuccessStatusCode)
-            {
+        private GenericOutcome ParseHttpResponse(HttpResponseMessage response) {
+            if (response.IsSuccessStatusCode) {
                 return new GenericOutcome();
             }
-            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
-            {
+            if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError) {
                 return new GenericOutcome(new GameLiftError(GameLiftErrorType.INTERNAL_SERVICE_EXCEPTION));
             }
+
             //We do not send specific errors from AuxProxy, just assuming bad requests here.
             return new GenericOutcome(new GameLiftError(GameLiftErrorType.BAD_REQUEST_EXCEPTION));
         }

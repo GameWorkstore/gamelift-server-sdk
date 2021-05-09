@@ -17,7 +17,7 @@ namespace Aws.GameLift.Server
 {
     public static class GameLiftServerAPI
     {
-        static readonly string sdkVersion = "4.0.0";
+        static readonly string sdkVersion = "4.0.2";
 
         /**
           * @return The current SDK version.
@@ -70,7 +70,11 @@ namespace Aws.GameLift.Server
           * Reports to GameLift that the GameSession has now ended.
           * GameLift will now expect the server process to call either ProcessReady in order to launch a new GameSession
           * or ProcessEnding which will trigger this process and host to be recycled.
+          *
+          * This API is deprecated. Please use ProcessEnding to end the process instead
           */
+
+        [Obsolete("This API is deprecated. Use ProcessEnding to end current process and start a new one instead")]
         public static GenericOutcome TerminateGameSession()
         {
             return ServerState.Instance.TerminateGameSession();
@@ -95,7 +99,7 @@ namespace Aws.GameLift.Server
         /**
         * @return The server's processes Epoch TerminationTime.
         */
-        public static AwsLongOutcome GetTerminationTime()
+        public static AwsDateTimeOutcome GetTerminationTime()
         {
             return ServerState.Instance.GetTerminationTime();
         }
