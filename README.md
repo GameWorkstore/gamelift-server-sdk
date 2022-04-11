@@ -7,12 +7,16 @@ Original Source Location: [https://aws.amazon.com/pt/gamelift/getting-started/](
 # How to install
 
 At package.json, add these line of code:
-> "com.gameworkstore.gameliftsdk": "git://github.com/GameWorkstore/gamelift-server-sdk"
+```json
+"com.gameworkstore.gameliftsdk": "https://github.com/GameWorkstore/gamelift-server-sdk.git#4.0.2008",
+```
 
 And wait for unity to download and compile the package.
 
-for update package for a newer version, install UpmGitExtension and update on [ Window > Package Manager ]!
-> https://github.com/mob-sakai/UpmGitExtension
+for update package for a newer version, update it's version at the of the line!
+```json
+"com.gameworkstore.gameliftsdk": "https://github.com/GameWorkstore/gamelift-server-sdk.git#4.0.2008",
+```
 
 ## Documention
 You can find the official GameLift documentation [here](https://aws.amazon.com/documentation/gamelift/).
